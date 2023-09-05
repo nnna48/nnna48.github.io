@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="zh-CN,en,default">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="FindFuner">
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://evan.beee.top" crossorigin>
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://example.com/2023/03/19/栈溢出漏洞逆向分析/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+        <meta name="description" content="前言子函数在运行过程中，由于存在危险函数，在数据移动过程中，突破了函数栈空间的边界，破坏了母函数栈空间中的内容，导致程序运行状态异常 分析环境和工具Windows XP Professional、VC 6.0、IDA、OllyICE StackOverflow程序结构 Main函数12345678910111213141516171819202122232425262728293031323334">
+<meta property="og:type" content="article">
+<meta property="og:title" content="栈溢出实验">
+<meta property="og:url" content="http://example.com/2023/03/19/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%BC%8F%E6%B4%9E%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="FindFuner">
+<meta property="og:description" content="前言子函数在运行过程中，由于存在危险函数，在数据移动过程中，突破了函数栈空间的边界，破坏了母函数栈空间中的内容，导致程序运行状态异常 分析环境和工具Windows XP Professional、VC 6.0、IDA、OllyICE StackOverflow程序结构 Main函数12345678910111213141516171819202122232425262728293031323334">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/1.png?raw=true">
+<meta property="og:image" content="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/2.png?raw=true">
+<meta property="og:image" content="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/3.png?raw=true">
+<meta property="og:image" content="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/4.png?raw=true">
+<meta property="og:image" content="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/5.png?raw=true">
+<meta property="og:image" content="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/6.png?raw=true">
+<meta property="og:image" content="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/7.png?raw=true">
+<meta property="og:image" content="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/8.png?raw=true">
+<meta property="og:image" content="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/9.png?raw=true">
+<meta property="article:published_time" content="2023-03-19T11:46:05.000Z">
+<meta property="article:modified_time" content="2023-03-19T11:56:14.346Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="栈溢出">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/1.png?raw=true">
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/icons/favicon.ico" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/icons/favicon.ico">
+    <meta name="theme-color" content="#005080">
+    <link rel="shortcut icon" href="/images/icons/favicon.ico">
+    <!--- Page Info-->
+    
+    <title>
+        
+            栈溢出实验 -
+        
+        FindFuner&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+<link rel="stylesheet" href="/assets/fonts.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+
+    <!--- Inject Part-->
+    
+    <script id="hexo-configurations">
+    let Global = window.Global || {};
+    Global.hexo_config = {"hostname":"example.com","root":"/","language":["zh-CN","en","default"],"path":"search.xml"};
+    Global.theme_config = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":["author"]},"code_block":{"copy":true,"style":"mac","font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":true,"lazyload":true,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#005080","secondary":null},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":true},"scroll_progress":{"bar":true,"percentage":false},"busuanzi_counter":{"enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"pjax":true,"open_graph":true},"home_banner":{"enable":true,"image":{"light":"/images/background/4.webp","dark":"/images/background/5.webp"},"title":"FindFuner's Blog","subtitle":{"text":["Hello Sabrina !","Hello World !"],"hitokoto":{"enable":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":true,"links":{"github":"https://github.com/nnna48","instagram":null,"zhihu":null,"twitter":null,"email":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":true,"type":"fixed","audios":[{"name":"七月十七之歌","artist":"SabrinaZhuang","url":"/七月十七之歌.mp3","cover":"/images/icons/zdf.webp"},{"name":"李进步写的另一首歌","artist":"SabrinaZhuang","url":"/李进步写的另一首歌.mp3","cover":"/images/icons/zdf.webp"}]},"mermaid":{"enable":false,"version":"9.3.0"}},"version":"2.1.2","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Categories and Tags":{"icon":"fa-regular fa-tag","submenus":{"Categories":"/categories","Tags":"/tags"}},"About":{"icon":"fa-regular fa-user","path":"/about"},"Friends":{"icon":"fa-regular fa-link","path":"/Friends"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"links":{"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Categories and Tags":{"icon":"fa-regular fa-tag","submenus":{"Categories":"/categories","Tags":"/tags"}},"About":{"icon":"fa-regular fa-user","path":"/about"},"Friends":{"icon":"fa-regular fa-link","path":"/Friends"}}},"article_date_format":"auto","categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}}};
+    Global.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="FindFuner" type="application/atom+xml">
+</head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+        <span class="scroll-progress-bar"></span>
+    
+
+    
+        <span class="pjax-progress-bar"></span>
+        <span class="pjax-progress-icon">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+        </span>
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="main-content-container">
+
+        <div class="main-content-header">
+            <header class="navbar-container">
+    
+    <div class="navbar-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                FindFuner&#39;s Blog
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="" 
+                                    href="/"  >
+                                    
+                                        
+                                            <i class="fa-regular fa-house"></i>
+                                        
+                                        首页
+                                    
+                                </a>
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="" 
+                                    href="/archives"  >
+                                    
+                                        
+                                            <i class="fa-regular fa-archive"></i>
+                                        
+                                        归档
+                                    
+                                </a>
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="has-dropdown" 
+                                    href="#" onClick="return false;">
+                                    
+                                        
+                                            <i class="fa-regular fa-tag"></i>
+                                        
+                                        CATEGORIES AND TAGS&nbsp;<i class="fa-solid fa-chevron-down"></i>
+                                    
+                                </a>
+                                <!-- Submenu -->
+                                
+                                    <ul class="sub-menu">
+                                    
+                                        <li>
+                                        <a href="/categories">分类
+                                        </a>
+                                        </li>
+                                    
+                                        <li>
+                                        <a href="/tags">标签
+                                        </a>
+                                        </li>
+                                    
+                                    </ul>
+                                
+                            </li>
+                    
+                        
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="" 
+                                    href="/about"  >
+                                    
+                                        
+                                            <i class="fa-regular fa-user"></i>
+                                        
+                                        关于
+                                    
+                                </a>
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="" 
+                                    href="/Friends"  >
+                                    
+                                        
+                                            <i class="fa-regular fa-link"></i>
+                                        
+                                        友情链接
+                                    
+                                </a>
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i></div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile drawer -->
+    <div class="navbar-drawer">
+        <ul class="drawer-navbar-list">
+            
+                
+                    <li class="drawer-navbar-item flex-center">
+                        <a class="" 
+                        href="/"  >
+                             
+                                
+                                    <i class="fa-regular fa-house"></i>
+                                
+                                首页
+                            
+                        </a>
+                    </li>
+                    <!-- Submenu -->
+                    
+            
+                
+                    <li class="drawer-navbar-item flex-center">
+                        <a class="" 
+                        href="/archives"  >
+                             
+                                
+                                    <i class="fa-regular fa-archive"></i>
+                                
+                                归档
+                            
+                        </a>
+                    </li>
+                    <!-- Submenu -->
+                    
+            
+                
+                    <li class="drawer-navbar-item flex-center">
+                        <a class="has-dropdown" 
+                        href="#" onClick="return false;">
+                            
+                                
+                                    <i class="fa-regular fa-tag"></i>
+                                
+                                CATEGORIES AND TAGS&nbsp;<i class="fa-solid fa-chevron-down"></i>
+                            
+                        </a>
+                    </li>
+                    <!-- Submenu -->
+                              
+                        
+                            <li class="dropdown-item flex-center">
+                                <a class="dropdown-item" href="/categories">分类</a>
+                            </li>
+                        
+                            <li class="dropdown-item flex-center">
+                                <a class="dropdown-item" href="/tags">标签</a>
+                            </li>
+                        
+                    
+            
+                
+                    <li class="drawer-navbar-item flex-center">
+                        <a class="" 
+                        href="/about"  >
+                             
+                                
+                                    <i class="fa-regular fa-user"></i>
+                                
+                                关于
+                            
+                        </a>
+                    </li>
+                    <!-- Submenu -->
+                    
+            
+                
+                    <li class="drawer-navbar-item flex-center">
+                        <a class="" 
+                        href="/Friends"  >
+                             
+                                
+                                    <i class="fa-regular fa-link"></i>
+                                
+                                友情链接
+                            
+                        </a>
+                    </li>
+                    <!-- Submenu -->
+                    
+            
+
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="main-content-body">
+
+            
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="post-page-container">
+        <div class="article-content-container">
+
+            
+             
+                <div class="article-title">         
+                    <img src="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/1.png?raw=true" alt="栈溢出实验" />
+                    <h1 class="article-title-cover">栈溢出实验</h1>
+                </div>
+            
+                
+            
+
+            
+                <div class="article-header">
+                    <div class="avatar">
+                        <img src="/images/icons/lubang.svg">
+                    </div>
+                    <div class="info">
+                        <div class="author">
+                            <span class="name">FindFuner</span>
+                            
+                                <span class="author-label">author</span>
+                            
+                        </div>
+                        <div class="meta-info">
+                            <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2023-03-19 19:46:05</span>
+        <span class="mobile">2023-03-19 19:46</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2023-03-19 19:56:14</span>
+            <span class="mobile">2023-03-19 19:56</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/categories/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/">逆向分析</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E6%A0%88%E6%BA%A2%E5%87%BA/">栈溢出</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+        <span class="article-wordcount article-meta-item">
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>1.9k 字</span>
+        </span>
+    
+    
+        <span class="article-min2read article-meta-item">
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>9 分钟</span>
+        </span>
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+                        </div>
+                    </div>
+                </div>
+            
+
+            <div class="article-content markdown-body">
+                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>子函数在运行过程中，由于存在危险函数，在数据移动过程中，突破了函数栈空间的边界，破坏了母函数栈空间中的内容，导致程序运行状态异常</p>
+<h2 id="分析环境和工具"><a href="#分析环境和工具" class="headerlink" title="分析环境和工具"></a>分析环境和工具</h2><p>Windows XP Professional、VC 6.0、IDA、OllyICE</p>
+<h2 id="StackOverflow程序结构"><a href="#StackOverflow程序结构" class="headerlink" title="StackOverflow程序结构"></a>StackOverflow程序结构</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/1.png?raw=true"
+                      alt="1"
+                ></p>
+<h3 id="Main函数"><a href="#Main函数" class="headerlink" title="Main函数"></a>Main函数</h3><div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line">.text:00401090</span><br><span class="line">.text:00401090 ; =============== S U B R O U T I N E =======================================</span><br><span class="line">.text:00401090</span><br><span class="line">.text:00401090 ; Attributes: bp-based frame</span><br><span class="line">.text:00401090</span><br><span class="line">.text:00401090 ; int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">.text:00401090 _main           proc near               ; CODE XREF: _main_0j</span><br><span class="line">.text:00401090</span><br><span class="line">.text:00401090 var_444         = byte ptr -444h</span><br><span class="line">.text:00401090 Str1            = byte ptr -404h</span><br><span class="line">.text:00401090 var_4           = dword ptr -4</span><br><span class="line">.text:00401090 argc            = dword ptr  8</span><br><span class="line">.text:00401090 argv            = dword ptr  0Ch</span><br><span class="line">.text:00401090 envp            = dword ptr  10h</span><br><span class="line">.text:00401090</span><br><span class="line">.text:00401090                 push    ebp</span><br><span class="line">.text:00401091                 mov     ebp, esp</span><br><span class="line">.text:00401093                 sub     esp, 444h</span><br><span class="line">.text:00401099                 push    ebx</span><br><span class="line">.text:0040109A                 push    esi</span><br><span class="line">.text:0040109B                 push    edi</span><br><span class="line">.text:0040109C                 lea     edi, [ebp+var_444]</span><br><span class="line">.text:004010A2                 mov     ecx, 111h</span><br><span class="line">.text:004010A7                 mov     eax, 0CCCCCCCCh</span><br><span class="line">.text:004010AC                 rep stosd</span><br><span class="line">.text:004010AE                 mov     [ebp+var_4], 0</span><br><span class="line">.text:004010B5</span><br><span class="line">.text:004010B5 loc_4010B5:                             ; CODE XREF: _main:loc_401115j</span><br><span class="line">.text:004010B5                 mov     eax, 1</span><br><span class="line">.text:004010BA                 test    eax, eax</span><br><span class="line">.text:004010BC                 jz      short loc_401117</span><br><span class="line">.text:004010BE                 push    offset Format   ; &quot;please input password:  &quot;</span><br><span class="line">.text:004010C3                 call    _printf</span><br><span class="line">.text:004010C8                 add     esp, 4</span><br><span class="line">.text:004010CB                 lea     ecx, [ebp+Str1]</span><br><span class="line">.text:004010D1                 push    ecx</span><br><span class="line">.text:004010D2                 push    offset aS       ; &quot;%s&quot;</span><br><span class="line">.text:004010D7                 call    _scanf</span><br><span class="line">.text:004010DC                 add     esp, 8</span><br><span class="line">.text:004010DF                 lea     edx, [ebp+Str1]</span><br><span class="line">.text:004010E5                 push    edx             ; Str1</span><br><span class="line">.text:004010E6                 call    j_?verify_password@@YAHPAD@Z ; verify_password(char *)</span><br><span class="line">.text:004010EB                 add     esp, 4</span><br><span class="line">.text:004010EE                 mov     [ebp+var_4], eax</span><br><span class="line">.text:004010F1                 cmp     [ebp+var_4], 0</span><br><span class="line">.text:004010F5                 jz      short loc_401106</span><br><span class="line">.text:004010F7                 push    offset aIncorrectPassw ; &quot;incorrect password!\n\n&quot;</span><br><span class="line">.text:004010FC                 call    _printf</span><br><span class="line">.text:00401101                 add     esp, 4</span><br><span class="line">.text:00401104                 jmp     short loc_401115</span><br><span class="line">.text:00401106 ; ---------------------------------------------------------------------------</span><br><span class="line">.text:00401106</span><br><span class="line">.text:00401106 loc_401106:                             ; CODE XREF: _main+65j</span><br><span class="line">.text:00401106                 push    offset aCongratulation ; &quot;congratulations! you have passed the ve&quot;...</span><br><span class="line">.text:0040110B                 call    _printf</span><br><span class="line">.text:00401110                 add     esp, 4</span><br><span class="line">.text:00401113                 jmp     short loc_401117</span><br><span class="line">.text:00401115 ; ---------------------------------------------------------------------------</span><br><span class="line">.text:00401115</span><br><span class="line">.text:00401115 loc_401115:                             ; CODE XREF: _main+74j</span><br><span class="line">.text:00401115                 jmp     short loc_4010B5</span><br><span class="line">.text:00401117 ; ---------------------------------------------------------------------------</span><br><span class="line">.text:00401117</span><br><span class="line">.text:00401117 loc_401117:                             ; CODE XREF: _main+2Cj</span><br><span class="line">.text:00401117                                         ; _main+83j</span><br><span class="line">.text:00401117                 push    offset Command  ; &quot;pause&quot;</span><br><span class="line">.text:0040111C                 call    _system</span><br><span class="line">.text:00401121                 add     esp, 4</span><br><span class="line">.text:00401124                 pop     edi</span><br><span class="line">.text:00401125                 pop     esi</span><br><span class="line">.text:00401126                 pop     ebx</span><br><span class="line">.text:00401127                 add     esp, 444h</span><br><span class="line">.text:0040112D                 cmp     ebp, esp</span><br><span class="line">.text:0040112F                 call    __chkesp</span><br><span class="line">.text:00401134                 mov     esp, ebp</span><br><span class="line">.text:00401136                 pop     ebp</span><br><span class="line">.text:00401137                 retn</span><br><span class="line">.text:00401137 _main           endp</span><br><span class="line">.text:00401137</span><br><span class="line">.text:00401137 ; ---------------------------------------------------------------------------</span><br></pre></td></tr></table></figure></div>
+
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/2.png?raw=true"
+                      alt="2"
+                ></p>
+<p>上图所示，为main函数创建函数栈空间。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mov     dword ptr [ebp-4], 0</span><br></pre></td></tr></table></figure></div>
+
+<p>创建局部变量，并置为零</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/3.png?raw=true"
+                      alt="3"
+                ></p>
+<p>上图部分，开始进入循环</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mov     eax, 1</span><br><span class="line">test    eax, eax</span><br><span class="line">jz      short loc_401117</span><br></pre></td></tr></table></figure></div>
+
+<p>eax为1，始终无法跳出循环，可判断是while(1)循环</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">push   00427090</span><br><span class="line">call    printf</span><br><span class="line">add     esp, 4</span><br></pre></td></tr></table></figure></div>
+
+<p>调用printf，并输出数据段存储的数据 “please input password:  ”</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">lea     ecx, dword ptr [ebp-404]</span><br><span class="line">push    ecx</span><br><span class="line">push    offset aS       ; &quot;%s&quot;</span><br><span class="line">call    _scanf</span><br><span class="line">add     esp, 8</span><br><span class="line">lea     edx, dword ptr [ebp-404]</span><br><span class="line">push    edx</span><br><span class="line">call    00401005</span><br></pre></td></tr></table></figure></div>
+
+<p>调用scanf，接收输入的数据，将接收的数据存入 esp+8 的位置，接着将 ebp-404 中所存数据存入 edx 中，并传给接下来调用的子函数 verify_password ，ebp-404 中存的是地址，所以传给子函数的也是地址</p>
+<p>接下来就进入子函数verify_password</p>
+<p>从子函数会到主函数，如下：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">add     esp, 4</span><br><span class="line">mov     dword ptr [ebp-4], eax</span><br><span class="line">cmp     dword ptr [ebp-4], 0</span><br><span class="line">je      short 00401106</span><br><span class="line">push    00427070                        ; /format = &quot;incorrect password!&quot;,LF,LF,&quot;&quot;</span><br><span class="line">call    printf                          ; \printf</span><br><span class="line">add     esp, 4                   </span><br><span class="line">jmp     short 00401115</span><br><span class="line">push    00427030                        ; /format = &quot;congratulations! you have passed the verification&quot;,LF,LF,&quot;&quot;</span><br><span class="line">call    printf                          ; \printf</span><br><span class="line">add     esp, 4</span><br><span class="line">jmp     short 00401117</span><br><span class="line">jmp     short 004010B5</span><br><span class="line">push    00427028                         ; /command = &quot;pause&quot;</span><br><span class="line">call    system                           ; \system</span><br><span class="line">add     esp, 4</span><br><span class="line">pop     edi</span><br><span class="line">pop     esi</span><br><span class="line">pop     ebx</span><br><span class="line">add     esp, 444</span><br><span class="line">cmp     ebp, esp</span><br><span class="line">call    _chkesp</span><br><span class="line">mov     esp, ebp</span><br><span class="line">pop     ebp</span><br><span class="line">retn</span><br></pre></td></tr></table></figure></div>
+
+<p>esp加4</p>
+<p>将从子函数返回的值——eax中存的数据，存到ebp-4中，再将ebp-4中的值与0作比较。</p>
+<p>若结果等于零，跳转至00401106的位置，对应“push    00427030”，从而调用printf函数，输出”congratulations! you have passed the verification”，esp加4，接着跳转至0040117，对应“push    00427028”，接着调用system函数，执行“pause”指令，终结循环，接着销毁函数栈，退出main函数。</p>
+<p>若结果不等于零，继续，调用函数printf，输出“incorrect password!”，esp加4，跳转至00401115，对应“jmp     short 004010B5”，又回到循环开始，继续循环。</p>
+<h3 id="verify-password函数"><a href="#verify-password函数" class="headerlink" title="verify_password函数"></a>verify_password函数</h3><div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">.text:00401020</span><br><span class="line">.text:00401020 ; =============== S U B R O U T I N E =======================================</span><br><span class="line">.text:00401020</span><br><span class="line">.text:00401020 ; Attributes: bp-based frame</span><br><span class="line">.text:00401020</span><br><span class="line">.text:00401020 ; int __cdecl verify_password(char *Str1)</span><br><span class="line">.text:00401020 ?verify_password@@YAHPAD@Z proc near    ; CODE XREF: verify_password(char *)j</span><br><span class="line">.text:00401020</span><br><span class="line">.text:00401020 var_4C          = byte ptr -4Ch</span><br><span class="line">.text:00401020 Dest            = byte ptr -0Ch</span><br><span class="line">.text:00401020 var_4           = dword ptr -4</span><br><span class="line">.text:00401020 Str1            = dword ptr  8</span><br><span class="line">.text:00401020</span><br><span class="line">.text:00401020                 push    ebp</span><br><span class="line">.text:00401021                 mov     ebp, esp</span><br><span class="line">.text:00401023                 sub     esp, 4Ch</span><br><span class="line">.text:00401026                 push    ebx</span><br><span class="line">.text:00401027                 push    esi</span><br><span class="line">.text:00401028                 push    edi</span><br><span class="line">.text:00401029                 lea     edi, [ebp+var_4C]</span><br><span class="line">.text:0040102C                 mov     ecx, 13h</span><br><span class="line">.text:00401031                 mov     eax, 0CCCCCCCCh</span><br><span class="line">.text:00401036                 rep stosd</span><br><span class="line">.text:00401038                 push    offset Str2     ; &quot;1234567&quot;</span><br><span class="line">.text:0040103D                 mov     eax, [ebp+Str1]</span><br><span class="line">.text:00401040                 push    eax             ; Str1</span><br><span class="line">.text:00401041                 call    _strcmp</span><br><span class="line">.text:00401046                 add     esp, 8</span><br><span class="line">.text:00401049                 mov     [ebp+var_4], eax</span><br><span class="line">.text:0040104C                 mov     ecx, [ebp+Str1]</span><br><span class="line">.text:0040104F                 push    ecx             ; Source</span><br><span class="line">.text:00401050                 lea     edx, [ebp+Dest]</span><br><span class="line">.text:00401053                 push    edx             ; Dest</span><br><span class="line">.text:00401054                 call    _strcpy</span><br><span class="line">.text:00401059                 add     esp, 8</span><br><span class="line">.text:0040105C                 mov     eax, [ebp+var_4]</span><br><span class="line">.text:0040105F                 pop     edi</span><br><span class="line">.text:00401060                 pop     esi</span><br><span class="line">.text:00401061                 pop     ebx</span><br><span class="line">.text:00401062                 add     esp, 4Ch</span><br><span class="line">.text:00401065                 cmp     ebp, esp</span><br><span class="line">.text:00401067                 call    __chkesp</span><br><span class="line">.text:0040106C                 mov     esp, ebp</span><br><span class="line">.text:0040106E                 pop     ebp</span><br><span class="line">.text:0040106F                 retn</span><br><span class="line">.text:0040106F ?verify_password@@YAHPAD@Z endp</span><br><span class="line">.text:0040106F</span><br><span class="line">.text:0040106F ; ---------------------------------------------------------------------------</span><br></pre></td></tr></table></figure></div>
+
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/4.png?raw=true"
+                      alt="4"
+                ></p>
+<p>创建子函数的函数栈空间</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">push    0042701C                         ; /s2 = &quot;1234567&quot;</span><br><span class="line">mov     eax, dword ptr [ebp+8]           ; |</span><br><span class="line">push    eax                              ; |s1</span><br><span class="line">call    strcmp                           ; \strcmp</span><br><span class="line">add     esp, 8</span><br><span class="line">mov     dword ptr [ebp-4], eax</span><br></pre></td></tr></table></figure></div>
+
+<p>将0042701C 中存的数据压入，再将ebp+8的位置存的数据通过eax压入，再调用strcmp函数对两者进行比较，将比较结果存入eax中，由于我输入的数据是123456，在与1234567比较后，eax中所存的值为FFFFFFFF，若我输入的值为1254，则eax中所存的值为00000001,若我输入的数据为1234567，则eax中所存数据为00000000。</p>
+<p>将esp加8</p>
+<p>将比较结果从eax中取出，存入ebp-4的位置，也就是子函数verify_password的栈底</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mov     ecx, dword ptr [ebp+8]</span><br><span class="line">push    ecx                              ; /src</span><br><span class="line">lea     edx, dword ptr [ebp-C]           ; |</span><br><span class="line">push    edx                              ; |dest</span><br><span class="line">call    strcpy                           ; \strcpy</span><br><span class="line">add     esp, 8</span><br></pre></td></tr></table></figure></div>
+
+<p>将ebp+8中存的数据存入ecx，再将ebp-C(ebp-8,C-&gt;Char)中的值存入edx，然后调用strcpy函数，将拷贝的值存入esp+8的位置</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mov     eax, dword ptr [ebp-4]</span><br><span class="line">pop     edi</span><br><span class="line">pop     esi</span><br><span class="line">pop     ebx</span><br><span class="line">add     esp, 4C</span><br><span class="line">cmp     ebp, esp</span><br><span class="line">call    _chkesp</span><br><span class="line">mov     esp, ebp</span><br><span class="line">pop     ebp</span><br><span class="line">retn</span><br></pre></td></tr></table></figure></div>
+
+<p>将ebp-4中所存结果存入eax中（这是用来保存子函数需要返回给主函数的值），然后进行一系列操作销毁函数栈，并执行retn，返回到主函数</p>
+<h2 id="栈溢出分析与利用"><a href="#栈溢出分析与利用" class="headerlink" title="栈溢出分析与利用"></a>栈溢出分析与利用</h2><p>该程序产生栈溢出的主要原因在于，子函数中采用了strcmp函数，在执行子函数时，会向函数栈的栈底先后存入整型变量authentication的值和char型数组buffer的值，这两个数据存放位置相邻，若通过strcpy函数存入buffer的字符串长度恰好等于buffer数组的长度，由于字符串最后一位还有截断字符，那么，阶段字符会将authentication的值覆盖，这将导致程序功能发生错误，比如原本程序输入“1234567”时才会显示成功，而现在我们只需要在保证authentication的值为00000001的情况下输入任意长度为8的一串数字就能得到显示成功的结果，效果如下图所示：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/5.png?raw=true"
+                      alt="5"
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/6.png?raw=true"
+                      alt="6"
+                ></p>
+<p>我们继续研究，就这个程序来说，我们有没有可能，利用栈溢出漏洞，做点其他事，比如弹出个cmd啥的，这一点由于个人能力有限，便向能力强的同学请教，得到以下利用方式：</p>
+<p>其中“^\”是ctrl+\，“^Q”是ctrl+Q，最后一个符号是@</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/7.png?raw=true"
+                      alt="7"
+                ></p>
+<p>在OllyICE中分析过程，可以看到，在执行完strcmp函数后，子函数verify_password栈底附近的变化，如下图所示</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/8.png?raw=true"
+                      alt="8"
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://github.com/nnna48/nnna48.github.io/blob/main/images/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C/9.png?raw=true"
+                      alt="9"
+                ></p>
+<p>可以看到，上述一串字符，覆盖至0012FB28的位置，导致该位置存的地址发生改变，改变之前，该地址指向主函数中执行完子函数后的位置，改变后的地址指向主函数中执行system的位置，也就是0040111C，从而执行了系统命令，达到弹出cmd的效果。</p>
+
+            </div>
+
+            
+                <div class="post-copyright-info">
+                    <div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> 栈溢出实验</li>
+        <li><strong>作者:</strong> FindFuner</li>
+        <li><strong>创建于:</strong> 2023-03-19 19:46:05</li>
+        
+            <li>
+                <strong>更新于:</strong> 2023-03-19 19:56:14
+            </li>
+        
+        <li>
+            <strong>链接:</strong> https://nnna48.github.io/2023/03/19/栈溢出漏洞逆向分析/
+        </li>
+        <li>
+            <strong>版权声明:</strong> 本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a> 进行许可。
+        </li>
+    </ul>
+</div>
+
+                </div>
+            
+
+            
+                <ul class="post-tags-box">
+                    
+                        <li class="tag-item">
+                            <a href="/tags/%E6%A0%88%E6%BA%A2%E5%87%BA/">#栈溢出</a>&nbsp;
+                        </li>
+                    
+                </ul>
+            
+
+            
+
+            
+                <div class="article-nav">
+                    
+                        <div class="article-prev">
+                            <a class="prev"
+                            rel="prev"
+                            href="/2023/04/17/%E5%AF%86%E7%A0%81%E5%B7%A5%E7%A8%8B%E7%AC%AC%E4%B8%89%E6%AC%A1%E8%AF%BE%E5%90%8E%E4%BD%9C%E4%B8%9A---ASN1/"
+                            >
+                                <span class="left arrow-icon flex-center">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </span>
+                                <span class="title flex-center">
+                                    <span class="post-nav-title-item">密码工程第三次课后作业---ASN1</span>
+                                    <span class="post-nav-item">上一篇</span>
+                                </span>
+                            </a>
+                        </div>
+                    
+                    
+                        <div class="article-next">
+                            <a class="next"
+                            rel="next"
+                            href="/2023/03/18/Hello-World-0/"
+                            >
+                                <span class="title flex-center">
+                                    <span class="post-nav-title-item">Hello World</span>
+                                    <span class="post-nav-item">下一篇</span>
+                                </span>
+                                <span class="right arrow-icon flex-center">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </span>
+                            </a>
+                        </div>
+                    
+                </div>
+            
+
+
+            
+        </div>
+
+        
+            <div class="toc-content-container">
+                <div class="post-toc-wrap">
+    <div class="post-toc">
+        <div class="toc-title">此页目录</div>
+        <div class="page-title">栈溢出实验</div>
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E7%8E%AF%E5%A2%83%E5%92%8C%E5%B7%A5%E5%85%B7"><span class="nav-text">分析环境和工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#StackOverflow%E7%A8%8B%E5%BA%8F%E7%BB%93%E6%9E%84"><span class="nav-text">StackOverflow程序结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Main%E5%87%BD%E6%95%B0"><span class="nav-text">Main函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#verify-password%E5%87%BD%E6%95%B0"><span class="nav-text">verify_password函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%88%E6%BA%A2%E5%87%BA%E5%88%86%E6%9E%90%E4%B8%8E%E5%88%A9%E7%94%A8"><span class="nav-text">栈溢出分析与利用</span></a></li></ol>
+
+    </div>
+</div>
+            </div>
+        
+    </div>
+</div>
+
+
+                
+
+            </div>
+            
+            
+
+        </div>
+
+        <div class="main-content-footer">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info">
+            &copy;
+            
+              <span>2023</span>
+              -
+            
+            2023&nbsp;&nbsp;<i class="fa-solid fa-train fa-beat" style="--fa-animation-duration: 0.5s"></i>&nbsp;&nbsp;<a href="/">FindFuner</a>
+        </div>
+        
+            <script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <div class="website-count info-item">
+                
+                    <span id="busuanzi_container_site_uv" class="busuanzi_container_site_uv">
+                        访问人数&nbsp;<span id="busuanzi_value_site_uv" class="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="busuanzi_container_site_pv">
+                        总访问量&nbsp;<span id="busuanzi_value_site_pv" class="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="theme-info info-item">
+            <span class="powered-by-container">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" href="https://hexo.io">Hexo</a> 驱动</span>
+                <br>
+            <span class="theme-version-container">主题&nbsp;<a class="theme-version" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.1.2</a>
+        </div>
+        
+        
+        
+            <div id="start_div" style="display:none">
+                2023/3/20 00:00:00
+            </div>
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+        
+            <script async data-pjax>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="article-tools-list">
+        <!-- TOC aside toggle -->
+        
+            <li class="right-bottom-tools page-aside-toggle">
+                <i class="fa-regular fa-outdent"></i>
+            </li>
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-side-tools-container">
+        <div class="side-tools-container">
+    <ul class="hidden-tools-list">
+        <li class="right-bottom-tools tool-font-adjust-plus flex-center">
+            <i class="fa-regular fa-magnifying-glass-plus"></i>
+        </li>
+
+        <li class="right-bottom-tools tool-font-adjust-minus flex-center">
+            <i class="fa-regular fa-magnifying-glass-minus"></i>
+        </li>
+
+        <li class="right-bottom-tools tool-expand-width flex-center">
+            <i class="fa-regular fa-expand"></i>
+        </li>
+
+        <li class="right-bottom-tools tool-dark-light-toggle flex-center">
+            <i class="fa-regular fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="right-bottom-tools tool-scroll-to-top flex-center">
+                <i class="fa-regular fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="right-bottom-tools tool-scroll-to-bottom flex-center">
+            <i class="fa-regular fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="visible-tools-list">
+        <li class="right-bottom-tools toggle-tools-list flex-center">
+            <i class="fa-regular fa-cog fa-spin"></i>
+        </li>
+        
+        
+    </ul>
+</div>
+
+    </div>
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+        <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+          <span class="search-input-field-pre">
+            <i class="fa-solid fa-keyboard"></i>
+          </span>
+            <div class="search-input-container">
+                <input autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
+                       placeholder="搜索..."
+                       spellcheck="false"
+                       type="search"
+                       class="search-input"
+                >
+            </div>
+            <span class="popup-btn-close">
+                <i class="fa-solid fa-times"></i>
+            </span>
+        </div>
+        <div id="search-result">
+            <div id="no-result">
+                <i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/layouts/navbarShrink.js"></script>
+
+<script src="/js/tools/scrollTopBottom.js"></script>
+
+<script src="/js/tools/lightDarkSwitch.js"></script>
+
+
+
+    
+<script src="/js/tools/localSearch.js"></script>
+
+
+
+
+    
+<script src="/js/tools/codeBlock.js"></script>
+
+
+
+
+    
+<script src="/js/layouts/lazyload.js"></script>
+
+
+
+
+    
+<script src="/js/tools/runtime.js"></script>
+
+    
+<script src="/js/layouts/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/libs/Typed.min.js"></script>
+
+  
+<script src="/js/plugins/typed.js"></script>
+
+
+
+
+
+
+
+<div class="post-scripts pjax">
+    
+        
+<script src="/js/tools/tocToggle.js"></script>
+
+<script src="/js/libs/anime.min.js"></script>
+
+<script src="/js/layouts/toc.js"></script>
+
+<script src="/js/plugins/tabs.js"></script>
+
+    
+</div>
+
+
+    
+<script src="/js/libs/pjax.min.js"></script>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        window.pjax = new Pjax({
+            selectors: [
+                'head title',
+                '.page-container',
+                '.pjax',
+            ],
+            history: true,
+            debug: false,
+            cacheBust: false,
+            timeout: 0,
+            analytics: false,
+            currentUrlFullReload: false,
+            scrollRestoration: false,
+            // scrollTo: true,
+        });
+
+        document.addEventListener('pjax:send', () => {
+            Global.utils.pjaxProgressBarStart();
+        });
+
+        document.addEventListener('pjax:complete', () => {
+            Global.utils.pjaxProgressBarEnd();
+            window.pjax.executeScripts(document.querySelectorAll('script[data-pjax], .pjax script'));
+            Global.refresh();
+        });
+    });
+</script>
+
+
+
+
+    <div id="aplayer"></div>
+
+<script src="/js/libs/APlayer.min.js"></script>
+
+
+<script src="/js/plugins/aplayer.js"></script>
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>
