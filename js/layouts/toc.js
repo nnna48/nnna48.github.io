@@ -7,7 +7,6 @@ function initTOC() {
     Global.utils = {
 
       ...Global.utils,
-      
 
       updateActiveTOCLink() {
         if (!Array.isArray(Global.utils.sections)) return;
@@ -45,36 +44,27 @@ function initTOC() {
       },
 
 
+
       activateTOCLink(index) {
         const target = document.querySelectorAll('.post-toc li a.nav-link')[index];
-      
-        if (!target || target.classList.contains('active-current')) {
+
+        if ( (!target || target.classList.contains('active-current')) ) {
           return;
         }
-      
+
         document.querySelectorAll('.post-toc .active').forEach(element => {
           element.classList.remove('active', 'active-current');
         });
         target.classList.add('active', 'active-current');
-      
-        // Scroll to the active TOC item
-        const tocElement = document.querySelector('.toc-content-container');
-        const tocTop = tocElement.getBoundingClientRect().top;
-        const scrollTopOffset = tocElement.offsetHeight > window.innerHeight ? (tocElement.offsetHeight - window.innerHeight) / 2 : 0;
-        const targetTop = target.getBoundingClientRect().top - tocTop;
-        const viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-        const distanceToCenter = targetTop - (viewportHeight / 2) + (target.offsetHeight / 2) - scrollTopOffset;
-        const scrollTop = tocElement.scrollTop + distanceToCenter;
-        
+        // Scrolling to center active TOC element if TOC content is taller then viewport.
+        const tocElement = document.querySelector('.post-toc-wrap');
         window.anime({
           targets: tocElement,
-          duration: 300,
-          easing: 'easeOutQuad',
-          scrollTop: scrollTop
+          duration: 200,
+          easing: 'linear',
+          scrollTop: tocElement.scrollTop - (tocElement.offsetHeight / 2) + target.getBoundingClientRect().top - tocElement.getBoundingClientRect().top
         });
       },
-      
-      
 
       showTOCAside() {
 

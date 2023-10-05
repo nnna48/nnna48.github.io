@@ -31,17 +31,12 @@ const navbarShrink = {
 
     if (document.querySelector('.navbar-drawer')) {
       domList.push(...document.querySelectorAll('.navbar-drawer .drawer-navbar-list .drawer-navbar-item'));
-      domList.push(...document.querySelectorAll('.navbar-drawer .drawer-navbar-list .dropdown-item'));
     }
 
     domList.forEach(v => {
-      if (!v.dataset.navbarInitialized)
-      {
-        v.dataset.navbarInitialized = 1;
-        v.addEventListener('click', () => {
-          document.body.classList.toggle('navbar-drawer-show');
-        });
-      }
+      v.addEventListener('click', () => {
+        document.body.classList.toggle('navbar-drawer-show');
+      });
     });
   }
 };
