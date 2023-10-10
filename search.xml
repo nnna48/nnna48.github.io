@@ -1009,9 +1009,9 @@
       </tags>
   </entry>
   <entry>
-    <title>漏洞分析技术实验1：shellcode弹出计数器</title>
+    <title>漏洞分析技术实验1：弹出计算器shellcode</title>
     <url>/2023/10/10/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h1 id="实验1：shellcode弹出计数器"><a href="#实验1：shellcode弹出计数器" class="headerlink" title="实验1：shellcode弹出计数器"></a>实验1：<strong>shellcode弹出计数器</strong></h1><h2 id="1-实验环境"><a href="#1-实验环境" class="headerlink" title="1. 实验环境"></a>1. 实验环境</h2><p>（1）虚拟机Winxp系统</p>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h1 id="实验1：弹出计算器shellcode"><a href="#实验1：弹出计算器shellcode" class="headerlink" title="实验1：弹出计算器shellcode"></a>实验1：<strong>弹出计算器shellcode</strong></h1><h2 id="1-实验环境"><a href="#1-实验环境" class="headerlink" title="1. 实验环境"></a>1. 实验环境</h2><p>（1）虚拟机Winxp系统</p>
 <p>（2）shellcode调试工具SCer.exe</p>
 <p>（2）计算器的shellcode代码shellcode2020.mybin</p>
 <p>（4）windbg和OllyDbg逆向分析软件</p>
