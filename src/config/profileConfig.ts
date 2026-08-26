@@ -33,12 +33,12 @@ export const profileConfig: ProfileConfig = {
 			url: "https://github.com/nnna48",
 			showName: false,
 		},
-		{
-			name: "Email",
-			icon: "fa7-solid:envelope",
-			url: "lupinfun@163.com",
-			showName: false,
-		},
+		// {
+		// 	name: "Email",
+		// 	icon: "fa7-solid:envelope",
+		// 	url: "mailto:lupinfun@163.com",
+		// 	showName: false,
+		// },
 		// {
 		// 	name: "RSS",
 		// 	icon: "fa7-solid:rss",
