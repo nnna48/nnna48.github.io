@@ -78,7 +78,7 @@ export const musicPlayerConfig: MusicPlayerConfig = {
 			{
 				name: "什么时候天气晴",
 				artist: "庄达菲",
-				url: "/assets/music/什么时候天气晴.mp3",
+				url: "/assets/music/庄达菲-什么时候天气晴.wav",
 				cover: "/assets/music/cover/sabrina03.avif",
 				lrc: "",
 			},
@@ -86,6 +86,13 @@ export const musicPlayerConfig: MusicPlayerConfig = {
 				name: "罗生门",
 				artist: "梨冻梨&wiz子豪",
 				url: "/assets/music/梨冻梨&wiz子豪-罗生门.mp3",
+				cover: "",
+				lrc: "",
+			},
+			{
+				name: "罗生门（follow）",
+				artist: "梨冻梨&wiz子豪",
+				url: "/assets/music/梨冻紧,Wiz_H张子豪-Follow.flac",
 				cover: "",
 				lrc: "",
 			},
