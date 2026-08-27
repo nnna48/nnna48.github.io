@@ -9,10 +9,10 @@ export const profileConfig: ProfileConfig = {
 	avatar: "assets/images/lupinIII.avif",
 
 	// 名字
-	name: "Findfuner",
+	name: "FunFul",
 
 	// 个人签名
-	bio: "Hello, I'm Findfuner.",
+	bio: "Hello, I'm FunFul.",
 
 	// 链接配置
 	// 已经预装的图标集：fa7-brands，fa7-regular，fa7-solid，material-symbols，simple-icons
