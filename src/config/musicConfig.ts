@@ -15,7 +15,7 @@ export const musicPlayerConfig: MusicPlayerConfig = {
 	volume: 0.7,
 
 	// 播放模式：'list'=列表循环, 'one'=单曲循环, 'random'=随机播放
-	playMode: "list",
+	playMode: "random",
 
 	// 是否显启用歌词
 	showLyrics: false,
@@ -47,11 +47,53 @@ export const musicPlayerConfig: MusicPlayerConfig = {
 	// lrc: "[00:00.00]歌词内容...",
 	local: {
 		playlist: [
+			// {
+			// 	name: "使一颗心免于哀伤",
+			// 	artist: "知更鸟 / HOYO-MiX / Chevy",
+			// 	url: "/assets/music/使一颗心免于哀伤-哼唱.mp3",
+			// 	cover: "/assets/music/cover/109951169585655912.webp",
+			// 	lrc: "",
+			// },
 			{
-				name: "使一颗心免于哀伤",
-				artist: "知更鸟 / HOYO-MiX / Chevy",
-				url: "/assets/music/使一颗心免于哀伤-哼唱.mp3",
-				cover: "/assets/music/cover/109951169585655912.webp",
+				name: "李进步写的另一首歌",
+				artist: "庄达菲",
+				url: "/assets/music/李进步写的另一首歌.mp3",
+				cover: "/assets/music/cover/sabrina02.avif",
+				lrc: "",
+			},
+			{
+				name: "七月十七之歌",
+				artist: "庄达菲",
+				url: "/assets/music/七月十七之歌.mp3",
+				cover: "/assets/music/cover/sabrina02.avif",
+				lrc: "",
+			},
+			{
+				name: "我想这一切都关于你",
+				artist: "庄达菲",
+				url: "/assets/music/我想这一切都关于你.mp3",
+				cover: "/assets/music/cover/sabrina02.avif",
+				lrc: "",
+			},
+			{
+				name: "什么时候天气晴",
+				artist: "庄达菲",
+				url: "/assets/music/什么时候天气晴.mp3",
+				cover: "/assets/music/cover/sabrina03.avif",
+				lrc: "",
+			},
+			{
+				name: "罗生门",
+				artist: "梨冻梨&wiz子豪",
+				url: "/assets/music/梨冻梨&wiz子豪-罗生门.mp3",
+				cover: "",
+				lrc: "",
+			},
+			{
+				name: "Falling U",
+				artist: "T-ara",
+				url: "/assets/music/Falling U - T-ara.mp3",
+				cover: "/assets/music/cover/t-ara.avif",
 				lrc: "",
 			},
 		],
